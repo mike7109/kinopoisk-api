@@ -1,0 +1,6977 @@
+openapi: 3.0.0
+info:
+  contact: {}
+  description: |2
+
+    <!-- Yandex.Metrika counter -->
+    <div><img src="https://mc.yandex.ru/watch/62307766" style="position:absolute; left:-9999px;" alt="" /></div>
+    <!-- /Yandex.Metrika counter -->
+    <p>Через этот API вы можете получить практически все данные из кинопоиска. Больше информации вы можете получить изучив эту документацию.</p>
+    <h2>Как работать с документацией?</h2>
+    <p>
+    Для начала работы с API вам необходимо получить токен, который вы можете получить в боте <a href="https://t.me/kinopoiskdev_bot">@kinopoiskdev_bot</a>. <br />
+    После получения токена, вам необходимо авторизоваться в документации, для этого нажмите на кнопку <strong>Authorize</strong> и введите токен в поле <strong>Value</strong>.<br />
+    После авторизации вы можете отправлять запросы к API, для этого нажмите на кнопку <strong>Try it out</strong> и заполните необходимые поля для составления нужного фильтра.<br />
+    После заполнения полей нажмите на кнопку <strong>Execute</strong> и получите ответ от API и пример запроса.
+    </p>
+    <h3>Как работать с API?</h3>
+    <p>
+    API работает по принципу REST, все запросы отправляются на адрес <code>https://api.kinopoisk.dev/</code> с указанием версии API и необходимого ресурса.<br />
+    Все запросы к API кинопоиска должны содержать заголовок <code>X-API-KEY</code> с вашим токеном. В противном случае вы получите ошибку <code>401</code>.<br />
+    При составлении запроса учитывайте, что все параметры должны быть в <code>query</code> и <code>path</code>. В зависимости от метода который вы используете.
+    Например, вы хотите получить список фильмов за 2023 год в жанре <code>криминал</code>, тогда ваш запрос будет выглядеть так: <code>https://api.kinopoisk.dev/v1.4/movie?year=2023&genres.name=криминал</code>.
+    Или вы хотите получить список фильмов с рейтингом выше 8, тогда ваш запрос будет выглядеть так: <code>https://api.kinopoisk.dev/v1.4/movie?rating.imdb=8-10</code>.
+    Документация kinopoisk api может помочь вам составить нужный запрос, для этого воспользуйтесь ее конструктором.
+    </p>
+    <h3>Особенности синтекса query параметров</h3>
+    <p>
+    Ключи в query параметрах имеют разные типы значений. В зависимости от типа значения, вы можете использовать разные операторы для фильтрации для поиска максимально релевантного фильма, сериала и т.д. в базе. <br />
+    Поля с типом <code>Number</code> могут принимать значения в форматах: <code>rating.kp=1-10</code>, <code>rating.kp=1</code>, <code>year=2022&year=2023</code>. <br />
+    Поля с типом <code>Date</code> могут принимать значения в форматах: <code>premiere.russia=dd.mm.yyyy-dd.mm.yyyy</code>, <code>premiere.russia=dd.mm.yyyy</code>. <br />
+    Поля с типом <code>String</code> могут принимать значения в форматах: <code>genres.name=драма</code>, <code>genres.name=криминал</code>, <code>genres.name=криминал&genres.name=драма</code> <br/>
+    Поля с типом <code>Boolean</code> могут принимать значения в форматах: <code>isSeries=true</code>, <code>isSeries=false</code>. <br />
+    Параметры жанров и стран могут принимать операторы <code>+</code> и <code>!</code>, для указания включаемых и исключаемых значений. Например, вы хотите получить список фильмов в жанрах <code>драма</code> и <code>криминал</code>, тогда ваш запрос будет выглядеть так: <code>genres.name=+драма&genres.name=+криминал</code>. Или вы хотите получить список фильмов с жанром <code>драма</code> и без жанра <code>криминал</code>, тогда ваш запрос будет выглядеть так: <code>genres.name=+драма&genres.name=!криминал</code>. <br />
+    </p>
+    <p>
+    Расшифровка операторов:
+    <ul>
+      <li><code>!</code> - исключить. Этот символ нужно отправлять в кодированной форме <code>%21</code></li>
+      <li><code>+</code> - включить. Этот символ нужно отправлять в кодированной форме <code>%2B</code></li>
+      <li><code>-</code> - диапазон значений, используется в качестве разделителя.</li>
+    </ul>
+    </p>
+
+    <p>По вопросам работы с API обращайтесь в чат <a href="https://t.me/+jeHPZVXiLPFhODJi">Developer Community KinopoiskDev</a>.</p>
+
+    <p>Если вы обнаружили ошибку или у вас есть предложения по улучшению, создавайте issue на <a href="https://github.com/mdwitr0/kinopoiskdev">GitHub</a>.</p>
+
+    <h3>Полезные ссылки:</h3>
+    <ul>
+      <li><a href="https://kinopoiskdev.readme.io">Более удобная документация</a></li>
+      <li><a href="https://github.com/OpenMovieDB/kinopoiskdev_client">JavaScript и TypeScript клиент (Устарел, ждет обновления)</a></li>
+      <li><a href="https://github.com/odi1n/kinopoisk_dev">Python клиент (Устарел, ждет обновления)</a></li>
+      <li><a href="/documentation-json">OpenAPI Specification (JSON)</a></li>
+      <li><a href="/documentation-yaml">OpenAPI Specification (YAML)</a></li>
+    </ul>
+  title: Документация для неофициального API кинопоиска (kinopoisk.dev).
+  version: "1.4"
+servers:
+- url: https://api.kinopoisk.dev
+paths:
+  /v1.4/movie/{id}:
+    get:
+      description: Возвращает всю доступную информацию о сущности.
+      operationId: MovieController_findOneV1_4
+      parameters:
+      - description: ID из кинопоиска
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: number
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieDtoV1_4'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorResponseDto'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenErrorResponseDto'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenErrorResponseDto'
+          description: NotFound
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+          description: Other
+      security:
+      - X-API-KEY: []
+      summary: Поиск по id
+      tags:
+      - "Фильмы, сериалы, и т.д."
+  /v1.4/movie:
+    get:
+      description: "Этот метод вернет список фильмов удовлетворяющих вашему запрос\
+        у. <br> В ответе придут поля указанные в параметре `selectFields`. Если ег\
+        о не указать, то вернутся только дефолтные поля."
+      operationId: MovieController_findManyByQueryV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - externalId
+            - name
+            - enName
+            - alternativeName
+            - names
+            - description
+            - shortDescription
+            - slogan
+            - type
+            - typeNumber
+            - isSeries
+            - status
+            - year
+            - releaseYears
+            - rating
+            - ratingMpaa
+            - ageRating
+            - votes
+            - seasonsInfo
+            - budget
+            - audience
+            - movieLength
+            - seriesLength
+            - totalSeriesLength
+            - genres
+            - countries
+            - poster
+            - backdrop
+            - logo
+            - ticketsOnSale
+            - videos
+            - networks
+            - persons
+            - facts
+            - fees
+            - premiere
+            - similarMovies
+            - sequelsAndPrequels
+            - watchability
+            - lists
+            - top10
+            - top250
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - externalId.imdb
+            - externalId.tmdb
+            - externalId.kpHD
+            - name
+            - enName
+            - alternativeName
+            - names.name
+            - description
+            - shortDescription
+            - slogan
+            - type
+            - typeNumber
+            - isSeries
+            - status
+            - year
+            - releaseYears.start
+            - releaseYears.end
+            - rating.kp
+            - rating.imdb
+            - rating.tmdb
+            - rating.filmCritics
+            - rating.russianFilmCritics
+            - rating.await
+            - ratingMpaa
+            - ageRating
+            - votes.kp
+            - votes.imdb
+            - votes.tmdb
+            - votes.filmCritics
+            - votes.russianFilmCritics
+            - votes.await
+            - budget.value
+            - budget.currency
+            - audience.count
+            - audience.country
+            - movieLength
+            - seriesLength
+            - totalSeriesLength
+            - genres.name
+            - countries.name
+            - poster.url
+            - backdrop.url
+            - logo.url
+            - ticketsOnSale
+            - videos.trailers.url
+            - videos.trailers.site
+            - videos.trailers.name
+            - networks.items.name
+            - networks.items.logo.url
+            - persons.id
+            - persons.name
+            - persons.enName
+            - persons.photo
+            - persons.description
+            - persons.profession
+            - persons.enProfession
+            - facts.type
+            - facts.value
+            - facts.spoiler
+            - fees.world.value
+            - fees.usa.value
+            - fees.russia.value
+            - premiere.world
+            - premiere.usa
+            - premiere.russia
+            - premiere.digital
+            - premiere.dvd
+            - premiere.bluRay
+            - premiere.cinema
+            - premiere.country
+            - similarMovies.id
+            - similarMovies.name
+            - similarMovies.enName
+            - similarMovies.alternativeName
+            - similarMovies.poster.url
+            - similarMovies.rating.kp
+            - similarMovies.rating.imdb
+            - similarMovies.rating.tmdb
+            - similarMovies.year
+            - sequelsAndPrequels.id
+            - sequelsAndPrequels.name
+            - sequelsAndPrequels.enName
+            - sequelsAndPrequels.alternativeName
+            - sequelsAndPrequels.poster.url
+            - sequelsAndPrequels.rating.kp
+            - sequelsAndPrequels.rating.imdb
+            - sequelsAndPrequels.rating.tmdb
+            - sequelsAndPrequels.year
+            - watchability.items.name
+            - watchability.items.url
+            - watchability.items.logo.url
+            - lists
+            - top10
+            - top250
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - externalId.imdb
+            - externalId.tmdb
+            - externalId.kpHD
+            - name
+            - enName
+            - alternativeName
+            - names.name
+            - description
+            - shortDescription
+            - slogan
+            - type
+            - typeNumber
+            - isSeries
+            - status
+            - year
+            - releaseYears.start
+            - releaseYears.end
+            - rating.kp
+            - rating.imdb
+            - rating.tmdb
+            - rating.filmCritics
+            - rating.russianFilmCritics
+            - rating.await
+            - ratingMpaa
+            - ageRating
+            - votes.kp
+            - votes.imdb
+            - votes.tmdb
+            - votes.filmCritics
+            - votes.russianFilmCritics
+            - votes.await
+            - budget.value
+            - budget.currency
+            - audience.count
+            - audience.country
+            - movieLength
+            - seriesLength
+            - totalSeriesLength
+            - genres.name
+            - countries.name
+            - poster.url
+            - backdrop.url
+            - logo.url
+            - ticketsOnSale
+            - videos.trailers.url
+            - videos.trailers.site
+            - videos.trailers.name
+            - networks.items.name
+            - networks.items.logo.url
+            - persons.id
+            - persons.name
+            - persons.enName
+            - persons.photo
+            - persons.description
+            - persons.profession
+            - persons.enProfession
+            - facts.type
+            - facts.value
+            - facts.spoiler
+            - fees.world.value
+            - fees.usa.value
+            - fees.russia.value
+            - premiere.world
+            - premiere.usa
+            - premiere.russia
+            - premiere.digital
+            - premiere.dvd
+            - premiere.bluRay
+            - premiere.cinema
+            - premiere.country
+            - similarMovies.id
+            - similarMovies.name
+            - similarMovies.enName
+            - similarMovies.alternativeName
+            - similarMovies.poster.url
+            - similarMovies.rating.kp
+            - similarMovies.rating.imdb
+            - similarMovies.rating.tmdb
+            - similarMovies.year
+            - sequelsAndPrequels.id
+            - sequelsAndPrequels.name
+            - sequelsAndPrequels.enName
+            - sequelsAndPrequels.alternativeName
+            - sequelsAndPrequels.poster.url
+            - sequelsAndPrequels.rating.kp
+            - sequelsAndPrequels.rating.imdb
+            - sequelsAndPrequels.rating.tmdb
+            - sequelsAndPrequels.year
+            - watchability.items.name
+            - watchability.items.url
+            - watchability.items.logo.url
+            - lists
+            - top10
+            - top250
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по IMDB ID (пример: `\"tt666\", \"tt555\", \"!tt666\"\
+          `)"
+        explode: true
+        in: query
+        name: externalId.imdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по TMDB ID (пример: `666, 555, !666`)"
+        explode: true
+        in: query
+        name: externalId.tmdb
+        required: false
+        schema:
+          items:
+            type: number
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по id KinoPoisk HD (пример: `\"48e8d0acb0f62d8585101798eaeceec5\"\
+          , \"!48e8d0acb0f62d8585101798eaeceec5\"`)"
+        explode: true
+        in: query
+        name: externalId.kpHD
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по типу фильма (пример: `\"movie\", \"tv-series\", \"\
+          !anime\"`)"
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            enum:
+            - movie
+            - tv-series
+            - cartoon
+            - animated-series
+            - anime
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по номеру типа фильма (пример: `1, 2, !3`). Список тип\
+          ов: 1 (movie), 2 (tv-series), 3 (cartoon), 4 (anime), 5 (animated-series)."
+        explode: true
+        in: query
+        name: typeNumber
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по индикатору сериала (пример: `true, false`)"
+        explode: true
+        in: query
+        name: isSeries
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по статусу фильма (пример: `\"announced\", \"completed\"\
+          , \"!filming\"`)"
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          items:
+            enum:
+            - announced
+            - completed
+            - filming
+            - post-production
+            - pre-production
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по году (пример: `1874, 2050, !2020, 2020-2024`)"
+        explode: true
+        in: query
+        name: year
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по года начала релиза (пример: `1874, 2050, !2020, 2020-2024`)"
+        explode: true
+        in: query
+        name: releaseYears.start
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по года окончания релиза (пример: `1874, 2050, !2020,\
+          \ 2020-2024`)"
+        explode: true
+        in: query
+        name: releaseYears.end
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу Кинопоиск (пример: `7, 10, 7.2-10`)"
+        explode: true
+        in: query
+        name: rating.kp
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу IMDB (пример: `7, 10, 7.2-10`)"
+        explode: true
+        in: query
+        name: rating.imdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу TMDB (пример: `7, 10, 7.2-10`)"
+        explode: true
+        in: query
+        name: rating.tmdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу MPAA (пример: `\"G\", \"NC-17\", \"!R\"`)"
+        explode: true
+        in: query
+        name: ratingMpaa
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по возрастному рейтингу (пример: `12, !18, 12-18`)"
+        explode: true
+        in: query
+        name: ageRating
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов на KP (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.kp
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов на IMDB (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.imdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов на TMDB (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.tmdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов кинокритиков (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.filmCritics
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов кинокритиков из России (пример:\
+          \ `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.russianFilmCritics
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов ожидания на Кинопоиске (пример:\
+          \ `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.await
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по бюджету фильма (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: budget.value
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству аудитории (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: audience.count
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по продолжительности фильма (пример: `100-120`)"
+        explode: true
+        in: query
+        name: movieLength
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по всей продолжительности одной серии (пример: `20-60`)"
+        explode: true
+        in: query
+        name: seriesLength
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по всей продолжительности сериала (пример: `100-120`)"
+        explode: true
+        in: query
+        name: totalSeriesLength
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по жанрам (пример: `\"драма\", \"комедия\", \"!мелодра\
+          ма\", \"+ужасы\"`)"
+        explode: true
+        in: query
+        name: genres.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по странам (пример: `\"США\", \"Россия\", \"!Франция\"\
+          \ , \"+Великобритания\"`)"
+        explode: true
+        in: query
+        name: countries.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по наличию билетов в продаже (пример: `true, false`)"
+        explode: true
+        in: query
+        name: ticketsOnSale
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сетям производства фильма (пример: `\"HBO\", \"Netflix\"\
+          , \"!Amazon\"`)"
+        explode: true
+        in: query
+        name: networks.items.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID персон (пример: `666, 555, !666`)"
+        explode: true
+        in: query
+        name: persons.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по профессиям персон (пример: `\"актер\", \"режиссер\"\
+          , \"!сценарист\"`)"
+        explode: true
+        in: query
+        name: persons.profession
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по английским профессиям персон (пример: `\"actor\", \"\
+          director\", \"!writer\"`)"
+        explode: true
+        in: query
+        name: persons.enProfession
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сборам в мире (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: fees.world
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сборам в США (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: fees.usa
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сборам в России (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: fees.russia
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в мире (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.world
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в США (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.usa
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в России (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.russia
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в стриминговых сервисах (пример: `01.01.2020,\
+          \ 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.digital
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в кинотеатрах (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.cinema
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по стране премьеры (пример: `\"США\", \"Россия\", \"!Ф\
+          ранция\" , \"+Великобритания\"`)"
+        explode: true
+        in: query
+        name: premiere.country
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk из списка похожих фильмов (пример: `666,\
+          \ 555, !666`)"
+        explode: true
+        in: query
+        name: similarMovies.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk из списка сиквелов и преквелов (пример\
+          : `666, 555, !666`)"
+        explode: true
+        in: query
+        name: sequelsAndPrequels.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по доуступным платформам для просмотра (пример: `\"ivi\"\
+          , \"okko\", \"!megogo\"`)"
+        explode: true
+        in: query
+        name: watchability.items.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по коллекциям из KinoPoisk (пример: `\"top250\", \"top-100-indian-movies\"\
+          , \"!top-100-movies\"`)"
+        explode: true
+        in: query
+        name: lists
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Универсальный поиск с фильтрами
+      tags:
+      - "Фильмы, сериалы, и т.д."
+  /v1.4/movie/search:
+    get:
+      description: Этот метод вернет список фильмов которые подходят под ваш запрос.
+      operationId: MovieController_searchMovieV1_4
+      parameters:
+      - description: Страница выборки
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Поисковый запрос
+        explode: true
+        in: query
+        name: query
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchMovieResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск фильмов по названию
+      tags:
+      - "Фильмы, сериалы, и т.д."
+  /v1.4/movie/random:
+    get:
+      description: "Этот метод вернет рандомный тайтл из базы. Вы можете составить\
+        \ фильтр, чтобы получить рандомный тайтл по вашим критериям."
+      operationId: MovieController_getRandomMovieV1_4
+      parameters:
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - externalId.imdb
+            - externalId.tmdb
+            - externalId.kpHD
+            - name
+            - enName
+            - alternativeName
+            - names.name
+            - description
+            - shortDescription
+            - slogan
+            - type
+            - typeNumber
+            - isSeries
+            - status
+            - year
+            - releaseYears.start
+            - releaseYears.end
+            - rating.kp
+            - rating.imdb
+            - rating.tmdb
+            - rating.filmCritics
+            - rating.russianFilmCritics
+            - rating.await
+            - ratingMpaa
+            - ageRating
+            - votes.kp
+            - votes.imdb
+            - votes.tmdb
+            - votes.filmCritics
+            - votes.russianFilmCritics
+            - votes.await
+            - budget.value
+            - budget.currency
+            - audience.count
+            - audience.country
+            - movieLength
+            - seriesLength
+            - totalSeriesLength
+            - genres.name
+            - countries.name
+            - poster.url
+            - backdrop.url
+            - logo.url
+            - ticketsOnSale
+            - videos.trailers.url
+            - videos.trailers.site
+            - videos.trailers.name
+            - networks.items.name
+            - networks.items.logo.url
+            - persons.id
+            - persons.name
+            - persons.enName
+            - persons.photo
+            - persons.description
+            - persons.profession
+            - persons.enProfession
+            - facts.type
+            - facts.value
+            - facts.spoiler
+            - fees.world.value
+            - fees.usa.value
+            - fees.russia.value
+            - premiere.world
+            - premiere.usa
+            - premiere.russia
+            - premiere.digital
+            - premiere.dvd
+            - premiere.bluRay
+            - premiere.cinema
+            - premiere.country
+            - similarMovies.id
+            - similarMovies.name
+            - similarMovies.enName
+            - similarMovies.alternativeName
+            - similarMovies.poster.url
+            - similarMovies.rating.kp
+            - similarMovies.rating.imdb
+            - similarMovies.rating.tmdb
+            - similarMovies.year
+            - sequelsAndPrequels.id
+            - sequelsAndPrequels.name
+            - sequelsAndPrequels.enName
+            - sequelsAndPrequels.alternativeName
+            - sequelsAndPrequels.poster.url
+            - sequelsAndPrequels.rating.kp
+            - sequelsAndPrequels.rating.imdb
+            - sequelsAndPrequels.rating.tmdb
+            - sequelsAndPrequels.year
+            - watchability.items.name
+            - watchability.items.url
+            - watchability.items.logo.url
+            - lists
+            - top10
+            - top250
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по IMDB ID (пример: `\"tt666\", \"tt555\", \"!tt666\"\
+          `)"
+        explode: true
+        in: query
+        name: externalId.imdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по TMDB ID (пример: `666, 555, !666`)"
+        explode: true
+        in: query
+        name: externalId.tmdb
+        required: false
+        schema:
+          items:
+            type: number
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по id KinoPoisk HD (пример: `\"48e8d0acb0f62d8585101798eaeceec5\"\
+          , \"!48e8d0acb0f62d8585101798eaeceec5\"`)"
+        explode: true
+        in: query
+        name: externalId.kpHD
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по типу фильма (пример: `\"movie\", \"tv-series\", \"\
+          !anime\"`)"
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            enum:
+            - movie
+            - tv-series
+            - cartoon
+            - animated-series
+            - anime
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по номеру типа фильма (пример: `1, 2, !3`). Список тип\
+          ов: 1 (movie), 2 (tv-series), 3 (cartoon), 4 (anime), 5 (animated-series)."
+        explode: true
+        in: query
+        name: typeNumber
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по индикатору сериала (пример: `true, false`)"
+        explode: true
+        in: query
+        name: isSeries
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по статусу фильма (пример: `\"announced\", \"completed\"\
+          , \"!filming\"`)"
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          items:
+            enum:
+            - announced
+            - completed
+            - filming
+            - post-production
+            - pre-production
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по году (пример: `1874, 2050, !2020, 2020-2024`)"
+        explode: true
+        in: query
+        name: year
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по года начала релиза (пример: `1874, 2050, !2020, 2020-2024`)"
+        explode: true
+        in: query
+        name: releaseYears.start
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по года окончания релиза (пример: `1874, 2050, !2020,\
+          \ 2020-2024`)"
+        explode: true
+        in: query
+        name: releaseYears.end
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу Кинопоиск (пример: `7, 10, 7.2-10`)"
+        explode: true
+        in: query
+        name: rating.kp
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу IMDB (пример: `7, 10, 7.2-10`)"
+        explode: true
+        in: query
+        name: rating.imdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу TMDB (пример: `7, 10, 7.2-10`)"
+        explode: true
+        in: query
+        name: rating.tmdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу MPAA (пример: `\"G\", \"NC-17\", \"!R\"`)"
+        explode: true
+        in: query
+        name: ratingMpaa
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по возрастному рейтингу (пример: `12, !18, 12-18`)"
+        explode: true
+        in: query
+        name: ageRating
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов на KP (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.kp
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов на IMDB (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.imdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов на TMDB (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.tmdb
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов кинокритиков (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.filmCritics
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов кинокритиков из России (пример:\
+          \ `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.russianFilmCritics
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству голосов ожидания на Кинопоиске (пример:\
+          \ `1000-6666666`)"
+        explode: true
+        in: query
+        name: votes.await
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по бюджету фильма (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: budget.value
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству аудитории (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: audience.count
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по продолжительности фильма (пример: `100-120`)"
+        explode: true
+        in: query
+        name: movieLength
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по всей продолжительности одной серии (пример: `20-60`)"
+        explode: true
+        in: query
+        name: seriesLength
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по всей продолжительности сериала (пример: `100-120`)"
+        explode: true
+        in: query
+        name: totalSeriesLength
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по жанрам (пример: `\"драма\", \"комедия\", \"!мелодра\
+          ма\", \"+ужасы\"`)"
+        explode: true
+        in: query
+        name: genres.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по странам (пример: `\"США\", \"Россия\", \"!Франция\"\
+          \ , \"+Великобритания\"`)"
+        explode: true
+        in: query
+        name: countries.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по наличию билетов в продаже (пример: `true, false`)"
+        explode: true
+        in: query
+        name: ticketsOnSale
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сетям производства фильма (пример: `\"HBO\", \"Netflix\"\
+          , \"!Amazon\"`)"
+        explode: true
+        in: query
+        name: networks.items.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID персон (пример: `666, 555, !666`)"
+        explode: true
+        in: query
+        name: persons.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по профессиям персон (пример: `\"актер\", \"режиссер\"\
+          , \"!сценарист\"`)"
+        explode: true
+        in: query
+        name: persons.profession
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по английским профессиям персон (пример: `\"actor\", \"\
+          director\", \"!writer\"`)"
+        explode: true
+        in: query
+        name: persons.enProfession
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сборам в мире (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: fees.world
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сборам в США (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: fees.usa
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по сборам в России (пример: `1000-6666666`)"
+        explode: true
+        in: query
+        name: fees.russia
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в мире (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.world
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в США (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.usa
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в России (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.russia
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в стриминговых сервисах (пример: `01.01.2020,\
+          \ 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.digital
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате премьеры в кинотеатрах (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: premiere.cinema
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по стране премьеры (пример: `\"США\", \"Россия\", \"!Ф\
+          ранция\" , \"+Великобритания\"`)"
+        explode: true
+        in: query
+        name: premiere.country
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk из списка похожих фильмов (пример: `666,\
+          \ 555, !666`)"
+        explode: true
+        in: query
+        name: similarMovies.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk из списка сиквелов и преквелов (пример\
+          : `666, 555, !666`)"
+        explode: true
+        in: query
+        name: sequelsAndPrequels.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по доуступным платформам для просмотра (пример: `\"ivi\"\
+          , \"okko\", \"!megogo\"`)"
+        explode: true
+        in: query
+        name: watchability.items.name
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по коллекциям из KinoPoisk (пример: `\"top250\", \"top-100-indian-movies\"\
+          , \"!top-100-movies\"`)"
+        explode: true
+        in: query
+        name: lists
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Получить рандомный тайтл из базы
+      tags:
+      - "Фильмы, сериалы, и т.д."
+  /v1.4/movie/awards:
+    get:
+      operationId: MovieController_findManyAwardsV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - winning
+            - nomination
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - winning
+            - nomination.award.title
+            - nomination.award.year
+            - nomination.title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - winning
+            - nomination.award.title
+            - nomination.award.year
+            - nomination.title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID фильма (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: movieId
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по номинациям (пример: `\"Оскар\", \"Золотой глобус\"\
+          `)"
+        explode: true
+        in: query
+        name: nomination.title
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по наградам (пример: `\"Лучший фильм\", \"Лучший актер\
+          \"`)"
+        explode: true
+        in: query
+        name: nomination.award.title
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по году награды (пример: `\"2019\", \"2020\"`)"
+        explode: true
+        in: query
+        name: nomination.award.year
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по победам (пример: `\"true\", \"false\"`)"
+        explode: true
+        in: query
+        name: winning
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MovieAwardDocsResponseDto'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Награды тайтлов
+      tags:
+      - "Фильмы, сериалы, и т.д."
+  /v1/movie/possible-values-by-field:
+    get:
+      description: "Этот метод принимает только определенные поля, и возвращает по\
+        \ ним все доступные значения."
+      operationId: MovieController_getPossibleValuesByFieldName
+      parameters:
+      - explode: true
+        in: query
+        name: field
+        required: true
+        schema:
+          enum:
+          - genres.name
+          - countries.name
+          - type
+          - typeNumber
+          - status
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PossibleValueDto'
+                type: array
+          description: ""
+        default:
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/PossibleValueDto'
+                type: array
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: "Получить список стран, жанров, и т.д."
+      tags:
+      - "Фильмы, сериалы, и т.д."
+  /v1.4/season:
+    get:
+      operationId: SeasonController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - poster
+            - number
+            - name
+            - enName
+            - duration
+            - description
+            - enDescription
+            - episodesCount
+            - airDate
+            - episodes
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - poster.url
+            - poster.previewUrl
+            - number
+            - name
+            - enName
+            - episodesCount
+            - airDate
+            - duration
+            - description
+            - enDescription
+            - episodes.number
+            - episodes.name
+            - episodes.enName
+            - episodes.airDate
+            - episodes.date
+            - episodes.description
+            - episodes.enDescription
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - poster.url
+            - poster.previewUrl
+            - number
+            - name
+            - enName
+            - episodesCount
+            - airDate
+            - duration
+            - description
+            - enDescription
+            - episodes.number
+            - episodes.name
+            - episodes.enName
+            - episodes.airDate
+            - episodes.date
+            - episodes.description
+            - episodes.enDescription
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID фильма (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: movieId
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по номеру сезона (пример: `\"1\", \"1-19\", \"!3\"`)"
+        explode: true
+        in: query
+        name: number
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по нормеру эпизода (пример: `\"1\", \"1-19\", \"!3\"`)"
+        explode: true
+        in: query
+        name: episodes.number
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате выхода сезона (пример: `\"2020-01-01-2020-12-31\"\
+          , \"2020-01-01\"`)"
+        explode: true
+        in: query
+        name: airDate
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате выхода эпизода (пример: `\"2020-01-01-2020-12-31\"\
+          , \"2020-01-01\"`)"
+        explode: true
+        in: query
+        name: episodes.airDate
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SeasonDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск сезонов
+      tags:
+      - Сезоны и эпизоды
+  /v1.4/review:
+    get:
+      description: "Этот метод предназначен для поиска персон по фильтрам. Он прин\
+        имает множество параметров, которые можно комбинировать между собой. Если\
+        \ вам нужен только поиск по имени, используйте метод `Полнотекстовый поиск\
+        ` (search). В этом методе также доступен выбор полей. А в ответ приходит п\
+        олная модель персоны."
+      operationId: ReviewController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - movieId
+            - title
+            - type
+            - review
+            - date
+            - author
+            - authorId
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - movieId
+            - title
+            - type
+            - review
+            - date
+            - author
+            - authorId
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - movieId
+            - title
+            - type
+            - review
+            - date
+            - author
+            - authorId
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID отзыва (пример: `\"111\", \"222\", \"!666\"`)"
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID фильма (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: movieId
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск отзывов по ID автора (пример: `\"666\", \"555\", \"!666\"\
+          `)"
+        explode: true
+        in: query
+        name: authorId
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по имени автора отзыва (пример: `\"КиноПоиск\", \"!Кин\
+          оПоиск\"`)"
+        explode: true
+        in: query
+        name: author
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по типу отзыва (пример: `\"!Негативный\", \"Нейтральны\
+          й\", \"Позитивный\"`)"
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            enum:
+            - Негативный
+            - Нейтральный
+            - Позитивный
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате создания отзыва (пример: `\"01.01.2021-01.01.2022\"\
+          , \"01.01.2021\"`)"
+        explode: true
+        in: query
+        name: date
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Универсальный поиск с фильтрами
+      tags:
+      - Отзывы пользователей
+  /v1.4/person/{id}:
+    get:
+      description: Возвращает всю доступную информацию о сущности.
+      operationId: PersonController_findOneV1_4
+      parameters:
+      - description: ID из кинопоиска
+        explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          type: number
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+          description: ""
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedErrorResponseDto'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenErrorResponseDto'
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenErrorResponseDto'
+          description: NotFound
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponseDto'
+          description: Other
+      security:
+      - X-API-KEY: []
+      summary: Поиск по id
+      tags:
+      - "Актеры, режиссеры, операторы, и т.д"
+  /v1.4/person:
+    get:
+      description: "Этот метод вернет список персон удовлетворяющих вашему запросу\
+        . <br> В ответе придут поля указанные в параметре `selectFields`. Если его\
+        \ не указать, то вернутся только дефолтные поля."
+      operationId: PersonController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - name
+            - enName
+            - photo
+            - sex
+            - growth
+            - birthday
+            - death
+            - age
+            - birthPlace
+            - deathPlace
+            - spouses
+            - countAwards
+            - profession
+            - facts
+            - movies
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - name
+            - enName
+            - photo
+            - sex
+            - growth
+            - birthday
+            - death
+            - age
+            - birthPlace.value
+            - deathPlace.value
+            - spouses.id
+            - spouses.name
+            - spouses.divorced
+            - spouses.divorcedReason
+            - spouses.sex
+            - spouses.children
+            - spouses.relation
+            - countAwards
+            - profession.value
+            - facts.value
+            - movies.id
+            - movies.name
+            - movies.alternativeName
+            - movies.rating
+            - movies.general
+            - movies.description
+            - movies.enProfession
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - name
+            - enName
+            - photo
+            - sex
+            - growth
+            - birthday
+            - death
+            - age
+            - birthPlace.value
+            - deathPlace.value
+            - spouses.id
+            - spouses.name
+            - spouses.divorced
+            - spouses.divorcedReason
+            - spouses.sex
+            - spouses.children
+            - spouses.relation
+            - countAwards
+            - profession.value
+            - facts.value
+            - movies.id
+            - movies.name
+            - movies.alternativeName
+            - movies.rating
+            - movies.general
+            - movies.description
+            - movies.enProfession
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk (пример: `\"111\", \"222\", \"!666\"`)"
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID фильма (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: movies.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по гендеру (пример: `Женский, Мужской`)"
+        explode: true
+        in: query
+        name: sex
+        required: false
+        schema:
+          items:
+            enum:
+            - Женский
+            - Мужской
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по росту (пример: `170-180, 180`)"
+        explode: true
+        in: query
+        name: growth
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате рождения (пример: `01.01.2000-01.01.2001, 01.01.2000`)"
+        explode: true
+        in: query
+        name: birthday
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате смерти (пример: `01.01.2000-01.01.2001, 01.01.2000`)"
+        explode: true
+        in: query
+        name: death
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по возрасту (пример: `18-25, 25`)"
+        explode: true
+        in: query
+        name: age
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по месту рождения (пример: `Москва, Санкт-Петербург`)"
+        explode: true
+        in: query
+        name: birthPlace.value
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по месту смерти (пример: `Москва, Санкт-Петербург`)"
+        explode: true
+        in: query
+        name: deathPlace.value
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID супруги(супруга) (пример: `111, 222`)"
+        explode: true
+        in: query
+        name: spouses.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по статусу развода (пример: `true, false`)"
+        explode: true
+        in: query
+        name: spouses.divorced
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - description: "Поиск по гендеру супруги(супруга) (пример: `Женский, Мужской\
+          `)"
+        explode: true
+        in: query
+        name: spouses.sex
+        required: false
+        schema:
+          items:
+            enum:
+            - Женский
+            - Мужской
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству наград (пример: `1-10, 10`)"
+        explode: true
+        in: query
+        name: countAwards
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по профессии (пример: `Актер, Режиссер`)"
+        explode: true
+        in: query
+        name: profession.value
+        required: false
+        schema:
+          items:
+            enum:
+            - Актер
+            - Актер дубляжа
+            - Актриса
+            - Актриса дубляжа
+            - В титрах не указаны
+            - "Группа: Хроника"
+            - "Группа: играют самих себя"
+            - Директор фильма
+            - Звукорежиссер
+            - Композитор
+            - Монтажер
+            - Озвучка
+            - Оператор
+            - Переводчик
+            - Продюсер
+            - Режиссер
+            - Режиссер дубляжа
+            - Сценарист
+            - Художник
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по рейтингу фильма (пример: `1-10, 10`)"
+        explode: true
+        in: query
+        name: movies.rating
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по профессии в фильмах на английском (пример: `actor,\
+          \ director`)"
+        explode: true
+        in: query
+        name: movies.enProfession
+        required: false
+        schema:
+          items:
+            enum:
+            - actor
+            - cameo
+            - composer
+            - design
+            - director
+            - director_ussr
+            - editor
+            - group_cameo
+            - group_uncredited
+            - operator
+            - producer
+            - sound_designer
+            - translator
+            - uncredited
+            - voice_director
+            - voiceover
+            - writer
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Универсальный поиск с фильтрами
+      tags:
+      - "Актеры, режиссеры, операторы, и т.д"
+  /v1.4/person/search:
+    get:
+      description: Этот метод вернет список персон которые подходят под ваш запрос.
+      operationId: PersonController_searchPersonV1_4
+      parameters:
+      - description: Страница выборки
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Поисковый запрос
+        explode: true
+        in: query
+        name: query
+        required: true
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchPersonResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: "Поиск актеров, режиссеров, и т.д по имени"
+      tags:
+      - "Актеры, режиссеры, операторы, и т.д"
+  /v1.4/person/awards:
+    get:
+      operationId: PersonController_findManyAwardsV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - personId
+            - winning
+            - nomination
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - personId
+            - winning
+            - nomination.award.title
+            - nomination.award.year
+            - nomination.title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - personId
+            - winning
+            - nomination.award.title
+            - nomination.award.year
+            - nomination.title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID персоны (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: personId
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по номинациям (пример: `\"Оскар\", \"Золотой глобус\"\
+          `)"
+        explode: true
+        in: query
+        name: nomination.title
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по наградам (пример: `\"Лучший фильм\", \"Лучший актер\
+          \"`)"
+        explode: true
+        in: query
+        name: nomination.award.title
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по году награды (пример: `\"2019\", \"2020\"`)"
+        explode: true
+        in: query
+        name: nomination.award.year
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по победам (пример: `\"true\", \"false\"`)"
+        explode: true
+        in: query
+        name: winning
+        required: false
+        schema:
+          nullable: true
+          type: string
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonAwardDocsResponseDto'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Награды актеров
+      tags:
+      - "Актеры, режиссеры, операторы, и т.д"
+  /v1.4/studio:
+    get:
+      description: Этот метод предназначен для поиска студий
+      operationId: StudioController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - subType
+            - title
+            - type
+            - movies
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - subType
+            - title
+            - type
+            - movies.id
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - subType
+            - title
+            - type
+            - movies.id
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по ID KinoPoisk (пример: `\"warnerbros\", \"222\", \"\
+          !666\"`)"
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по ID фильма (пример: `\"666\", \"555\", \"!666\"`)"
+        explode: true
+        in: query
+        name: movies.id
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по типу студии (пример: `\"Производство\", \"Студия ду\
+          бляжа\"`)"
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по типу студии (пример: `\"company\", \"studio\"`)"
+        explode: true
+        in: query
+        name: subType
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по названию студии (пример: `\"Warner Bros.\", \"!Warner\
+          \ Bros.\"`)"
+        explode: true
+        in: query
+        name: title
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudioDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск студий
+      tags:
+      - Студии
+  /v1.4/keyword:
+    get:
+      description: Этот метод предназначен для поиска ключевых слов
+      operationId: KeywordController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - movies
+            - title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - movies.id
+            - title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - id
+            - movies.id
+            - title
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск ключевого слова по id (пример: `\"666\", \"!666\"`)"
+        explode: true
+        in: query
+        name: id
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск ключевых слов по id фильма (пример: `\"666\", \"!666\"\
+          `)"
+        explode: true
+        in: query
+        name: movies.id
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск ключевых слов по наименованию (пример: `\"1980-е\", \"\
+          !1980-е\"`)"
+        explode: true
+        in: query
+        name: title
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeywordDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск ключевых слов
+      tags:
+      - Ключевые слова
+  /v1.4/image:
+    get:
+      description: Этот метод предназначен для поиска картинок которые привязаны к
+        фильмам и сериалам
+      operationId: ImageController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - type
+            - language
+            - url
+            - previewUrl
+            - height
+            - width
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - type
+            - language
+            - url
+            - previewUrl
+            - height
+            - width
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - movieId
+            - type
+            - language
+            - url
+            - previewUrl
+            - height
+            - width
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск картинок по id фильма (пример: `\"666\", \"!666\"`)"
+        explode: true
+        in: query
+        name: movieId
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск картинок по типу (пример: `\"cover\", \"!cover\"`)"
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          items:
+            enum:
+            - backdrops
+            - cover
+            - frame
+            - promo
+            - screenshot
+            - shooting
+            - still
+            - wallpaper
+            type: string
+          type: array
+        style: form
+      - description: "Поиск картинок по языку (пример: `\"en\", \"!de\"`)"
+        explode: true
+        in: query
+        name: language
+        required: false
+        schema:
+          items:
+            enum:
+            - ab
+            - af
+            - am
+            - ar
+            - as
+            - av
+            - ba
+            - be
+            - bg
+            - bn
+            - ca
+            - ce
+            - cn
+            - cs
+            - cu
+            - cv
+            - da
+            - de
+            type: string
+          type: array
+        style: form
+      - description: "Поиск картинок по высоте (пример: `\"1920\", \"360-1920\"`)"
+        explode: true
+        in: query
+        name: height
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск картинок по ширине (пример: `\"1080\", \"320-1080\"`)"
+        explode: true
+        in: query
+        name: width
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск картинок
+      tags:
+      - "Постеры, фоны, кадры, скриншоты и т.д."
+  /v1.4/list:
+    get:
+      description: Этот метод предназначен для поиска коллекций кино
+      operationId: ListController_findManyV1_4
+      parameters:
+      - description: Номер страницы
+        explode: true
+        in: query
+        name: page
+        required: false
+        schema:
+          default: 1
+          minimum: 1
+          type: number
+        style: form
+      - description: Количество элементов на странице
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          default: 10
+          maximum: 250
+          minimum: 1
+          type: number
+        style: form
+      - description: Список полей требуемых в ответе из модели
+        explode: true
+        in: query
+        name: selectFields
+        required: false
+        schema:
+          items:
+            enum:
+            - name
+            - category
+            - slug
+            - moviesCount
+            - cover
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Список полей которые не должны быть null или пусты
+        explode: true
+        in: query
+        name: notNullFields
+        required: false
+        schema:
+          items:
+            enum:
+            - name
+            - category
+            - slug
+            - moviesCount
+            - cover.url
+            - cover.previewUrl
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: Сортировка по полям из модели
+        explode: true
+        in: query
+        name: sortField
+        required: false
+        schema:
+          items:
+            enum:
+            - name
+            - category
+            - slug
+            - moviesCount
+            - cover.url
+            - cover.previewUrl
+            - updatedAt
+            - createdAt
+            type: string
+          type: array
+        style: form
+      - description: "Тип сортировки применительно к полям из sortField (пример: `\"\
+          1\", \"-1\"`)"
+        explode: true
+        in: query
+        name: sortType
+        required: false
+        schema:
+          items:
+            type: string
+          type: array
+        style: form
+      - description: "Поиск slug (пример: `\"!top250\", \"top250\"`)"
+        explode: true
+        in: query
+        name: slug
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по категории (пример: `\"Фильмы\", \"!Фильмы\"`)"
+        explode: true
+        in: query
+        name: category
+        required: false
+        schema:
+          items:
+            enum:
+            - Онлайн-кинотеатр
+            - Премии
+            - Сборы
+            - Сериалы
+            - Фильмы
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по количеству фильмов (пример: `\"1-200\", \"10\"`)"
+        explode: true
+        in: query
+        name: moviesCount
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате обновления в базе (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: updatedAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      - description: "Поиск по дате добавления в базу (пример: `01.01.2020, 01.01.2020-31.12.2020`)"
+        explode: true
+        in: query
+        name: createdAt
+        required: false
+        schema:
+          items:
+            type: string
+          nullable: true
+          type: array
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListDocsResponseDtoV1_4'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск коллекций
+      tags:
+      - Коллекции кино
+  /v1.4/list/{slug}:
+    get:
+      description: Этот метод предназначен для поиска коллекции кино по slug
+      operationId: ListController_findOneV1_4
+      parameters:
+      - explode: false
+        in: path
+        name: slug
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/List'
+          description: ""
+      security:
+      - X-API-KEY: []
+      summary: Поиск коллекции по slug
+      tags:
+      - Коллекции кино
+components:
+  schemas:
+    ExternalId:
+      example:
+        tmdb: 9799
+        kpHD: 48e8d0acb0f62d8585101798eaeceec5
+        imdb: tt0232500
+      properties:
+        kpHD:
+          description: ID из kinopoisk HD
+          example: 48e8d0acb0f62d8585101798eaeceec5
+          nullable: true
+          type: string
+        imdb:
+          example: tt0232500
+          nullable: true
+          type: string
+        tmdb:
+          example: 9799
+          nullable: true
+          type: number
+      type: object
+    Name:
+      example:
+        name: name
+        language: language
+        type: type
+      properties:
+        name:
+          type: string
+        language:
+          nullable: true
+          type: string
+        type:
+          nullable: true
+          type: string
+      type: object
+    Rating:
+      example:
+        tmdb: 3.2
+        imdb: 8.4
+        kp: 6.2
+        await: 6.1
+        russianFilmCritics: 5.1
+        filmCritics: 10
+      properties:
+        kp:
+          description: Рейтинг кинопоиска
+          example: 6.2
+          nullable: true
+          type: number
+        imdb:
+          description: Рейтинг IMDB
+          example: 8.4
+          nullable: true
+          type: number
+        tmdb:
+          description: Рейтинг TMDB
+          example: 3.2
+          nullable: true
+          type: number
+        filmCritics:
+          description: Рейтинг кинокритиков
+          example: 10
+          nullable: true
+          type: number
+        russianFilmCritics:
+          description: Рейтинг кинокритиков из РФ
+          example: 5.1
+          nullable: true
+          type: number
+        await:
+          description: Рейтинг основанный на ожиданиях пользователей
+          example: 6.1
+          nullable: true
+          type: number
+      type: object
+    Votes:
+      example:
+        tmdb: 10000
+        imdb: 50000
+        kp: "60000"
+        await: 34000
+        russianFilmCritics: 4000
+        filmCritics: 10000
+      properties:
+        kp:
+          example: "60000"
+          nullable: true
+          type: string
+        imdb:
+          example: 50000
+          nullable: true
+          type: number
+        tmdb:
+          example: 10000
+          nullable: true
+          type: number
+        filmCritics:
+          description: Количество голосов кинокритиков
+          example: 10000
+          nullable: true
+          type: number
+        russianFilmCritics:
+          description: Количество голосов кинокритиков из РФ
+          example: 4000
+          nullable: true
+          type: number
+        await:
+          description: Количество ожидающих выхода
+          example: 34000
+          nullable: true
+          type: number
+      type: object
+    Logo:
+      example:
+        url: url
+      properties:
+        url:
+          description: "Чтобы найти фильмы с этим полем, используйте: `!null`"
+          nullable: true
+          type: string
+      type: object
+    ShortImage:
+      example:
+        previewUrl: previewUrl
+        url: url
+      properties:
+        url:
+          description: "Чтобы найти фильмы с этим полем, используйте: `!null`"
+          nullable: true
+          type: string
+        previewUrl:
+          description: "Чтобы найти фильмы с этим полем, используйте: `!null`"
+          nullable: true
+          type: string
+      type: object
+    Video:
+      example:
+        site: youtube
+        size: 0.8008281904610115
+        name: Official Trailer
+        type: TRAILER
+        url: https://www.youtube.com/embed/ZsJz2TJAPjw
+      properties:
+        url:
+          description: Url трейлера
+          example: https://www.youtube.com/embed/ZsJz2TJAPjw
+          nullable: true
+          type: string
+        name:
+          example: Official Trailer
+          nullable: true
+          type: string
+        site:
+          example: youtube
+          nullable: true
+          type: string
+        type:
+          example: TRAILER
+          nullable: true
+          type: string
+        size:
+          type: number
+      required:
+      - size
+      type: object
+    VideoTypes:
+      example:
+        teasers:
+        - site: youtube
+          size: 0.8008281904610115
+          name: Official Trailer
+          type: TRAILER
+          url: https://www.youtube.com/embed/ZsJz2TJAPjw
+        - site: youtube
+          size: 0.8008281904610115
+          name: Official Trailer
+          type: TRAILER
+          url: https://www.youtube.com/embed/ZsJz2TJAPjw
+        trailers:
+        - site: youtube
+          size: 0.8008281904610115
+          name: Official Trailer
+          type: TRAILER
+          url: https://www.youtube.com/embed/ZsJz2TJAPjw
+        - site: youtube
+          size: 0.8008281904610115
+          name: Official Trailer
+          type: TRAILER
+          url: https://www.youtube.com/embed/ZsJz2TJAPjw
+      properties:
+        trailers:
+          items:
+            $ref: '#/components/schemas/Video'
+          type: array
+        teasers:
+          items:
+            $ref: '#/components/schemas/Video'
+          type: array
+      required:
+      - teasers
+      type: object
+    ItemName:
+      example:
+        name: name
+      properties:
+        name:
+          type: string
+      type: object
+    PersonInMovie:
+      example:
+        profession: profession
+        name: Пол Уокер
+        enName: Paul Walker
+        photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+        description: description
+        id: 6317
+        enProfession: enProfession
+      properties:
+        id:
+          description: Id персоны с кинопоиска
+          example: 6317
+          nullable: true
+          type: number
+        photo:
+          example: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+          nullable: true
+          type: string
+        name:
+          example: Пол Уокер
+          nullable: true
+          type: string
+        enName:
+          example: Paul Walker
+          nullable: true
+          type: string
+        description:
+          type: string
+        profession:
+          type: string
+        enProfession:
+          type: string
+      required:
+      - description
+      - enProfession
+      - profession
+      type: object
+    ReviewInfo:
+      example:
+        positiveCount: 1.4658129805029452
+        percentage: percentage
+        count: 6.027456183070403
+      properties:
+        count:
+          nullable: true
+          type: number
+        positiveCount:
+          nullable: true
+          type: number
+        percentage:
+          nullable: true
+          type: string
+      type: object
+    SeasonInfo:
+      example:
+        number: 5.962133916683182
+        episodesCount: 5.637376656633329
+      properties:
+        number:
+          nullable: true
+          type: number
+        episodesCount:
+          nullable: true
+          type: number
+      type: object
+    CurrencyValue:
+      example:
+        currency: €
+        value: 207283
+      properties:
+        value:
+          description: Сумма
+          example: 207283
+          nullable: true
+          type: number
+        currency:
+          description: Валюта
+          example: €
+          nullable: true
+          type: string
+      type: object
+    Fees:
+      example:
+        usa:
+          currency: €
+          value: 207283
+        world:
+          currency: €
+          value: 207283
+        russia:
+          currency: €
+          value: 207283
+      properties:
+        world:
+          $ref: '#/components/schemas/CurrencyValue'
+        russia:
+          $ref: '#/components/schemas/CurrencyValue'
+        usa:
+          $ref: '#/components/schemas/CurrencyValue'
+      type: object
+    Premiere:
+      example:
+        digital: digital
+        country: США
+        world: 2023-02-25T02:44:39.359Z
+        dvd: dvd
+        russia: 2023-02-25T02:44:39.359Z
+        cinema: 2023-02-25T02:44:39.359Z
+        bluray: bluray
+      properties:
+        country:
+          example: США
+          nullable: true
+          type: string
+        world:
+          description: "Для более релевантного поиска, используйте интервал дат 01.02.2022-01.02.2023"
+          example: 2023-02-25T02:44:39.359Z
+          format: date-time
+          nullable: true
+          type: string
+        russia:
+          description: "Для более релевантного поиска, используйте интервал дат 01.02.2022-01.02.2023"
+          example: 2023-02-25T02:44:39.359Z
+          format: date-time
+          nullable: true
+          type: string
+        digital:
+          nullable: true
+          type: string
+        cinema:
+          description: "Для более релевантного поиска, используйте интервал дат 01.02.2022-01.02.2023"
+          example: 2023-02-25T02:44:39.359Z
+          format: date-time
+          nullable: true
+          type: string
+        bluray:
+          type: string
+        dvd:
+          type: string
+      required:
+      - bluray
+      - dvd
+      type: object
+    LinkedMovieV1_4:
+      example:
+        year: 2021
+        rating:
+          tmdb: 3.2
+          imdb: 8.4
+          kp: 6.2
+          await: 6.1
+          russianFilmCritics: 5.1
+          filmCritics: 10
+        name: name
+        enName: enName
+        id: 2.3021358869347655
+        alternativeName: alternativeName
+        type: type
+        poster:
+          previewUrl: previewUrl
+          url: url
+      properties:
+        id:
+          nullable: true
+          type: number
+        rating:
+          $ref: '#/components/schemas/Rating'
+        year:
+          example: 2021
+          type: number
+        name:
+          type: string
+        enName:
+          type: string
+        alternativeName:
+          type: string
+        type:
+          type: string
+        poster:
+          $ref: '#/components/schemas/ShortImage'
+      required:
+      - alternativeName
+      - enName
+      - name
+      - poster
+      - rating
+      - year
+      type: object
+    WatchabilityItem:
+      example:
+        name: name
+        logo:
+          url: url
+        url: url
+      properties:
+        name:
+          nullable: true
+          type: string
+        logo:
+          $ref: '#/components/schemas/Logo'
+        url:
+          type: string
+      required:
+      - logo
+      - url
+      type: object
+    Watchability:
+      example:
+        items:
+        - name: name
+          logo:
+            url: url
+          url: url
+        - name: name
+          logo:
+            url: url
+          url: url
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/WatchabilityItem'
+          type: array
+      type: object
+    YearRange:
+      example:
+        start: 2022
+        end: 2023
+      properties:
+        start:
+          description: Год начала
+          example: 2022
+          nullable: true
+          type: number
+        end:
+          description: Год окончания
+          example: 2023
+          nullable: true
+          type: number
+      type: object
+    Audience:
+      example:
+        country: Россия
+        count: 1000
+      properties:
+        count:
+          description: Количество просмотров в кино
+          example: 1000
+          type: number
+        country:
+          description: Страна в которой проходил показ
+          example: Россия
+          type: string
+      required:
+      - count
+      - country
+      type: object
+    NetworkItemV1_4:
+      example:
+        name: Netflix
+        logo:
+          url: url
+      properties:
+        name:
+          example: Netflix
+          type: string
+        logo:
+          $ref: '#/components/schemas/Logo'
+      required:
+      - logo
+      - name
+      type: object
+    NetworksV1_4:
+      example:
+        items:
+        - name: Netflix
+          logo:
+            url: url
+        - name: Netflix
+          logo:
+            url: url
+      properties:
+        items:
+          items:
+            $ref: '#/components/schemas/NetworkItemV1_4'
+          type: array
+      required:
+      - items
+      type: object
+    FactInMovie:
+      example:
+        spoiler: true
+        type: type
+        value: value
+      properties:
+        value:
+          type: string
+        type:
+          type: string
+        spoiler:
+          type: boolean
+      required:
+      - spoiler
+      - type
+      - value
+      type: object
+    Images:
+      example:
+        framesCount: 3.616076749251911
+        postersCount: 7.061401241503109
+        backdropsCount: 9.301444243932576
+      properties:
+        postersCount:
+          type: number
+        backdropsCount:
+          type: number
+        framesCount:
+          type: number
+      required:
+      - backdropsCount
+      - framesCount
+      - postersCount
+      type: object
+    MovieDtoV1_4:
+      example:
+        imagesInfo:
+          framesCount: 3.616076749251911
+          postersCount: 7.061401241503109
+          backdropsCount: 9.301444243932576
+        fees:
+          usa:
+            currency: €
+            value: 207283
+          world:
+            currency: €
+            value: 207283
+          russia:
+            currency: €
+            value: 207283
+        year: 2023
+        rating:
+          tmdb: 3.2
+          imdb: 8.4
+          kp: 6.2
+          await: 6.1
+          russianFilmCritics: 5.1
+          filmCritics: 10
+        description: description
+        videos:
+          teasers:
+          - site: youtube
+            size: 0.8008281904610115
+            name: Official Trailer
+            type: TRAILER
+            url: https://www.youtube.com/embed/ZsJz2TJAPjw
+          - site: youtube
+            size: 0.8008281904610115
+            name: Official Trailer
+            type: TRAILER
+            url: https://www.youtube.com/embed/ZsJz2TJAPjw
+          trailers:
+          - site: youtube
+            size: 0.8008281904610115
+            name: Official Trailer
+            type: TRAILER
+            url: https://www.youtube.com/embed/ZsJz2TJAPjw
+          - site: youtube
+            size: 0.8008281904610115
+            name: Official Trailer
+            type: TRAILER
+            url: https://www.youtube.com/embed/ZsJz2TJAPjw
+        type: movie
+        networks:
+        - items:
+          - name: Netflix
+            logo:
+              url: url
+          - name: Netflix
+            logo:
+              url: url
+        - items:
+          - name: Netflix
+            logo:
+              url: url
+          - name: Netflix
+            logo:
+              url: url
+        facts:
+        - spoiler: true
+          type: type
+          value: value
+        - spoiler: true
+          type: type
+          value: value
+        reviewInfo:
+          positiveCount: 1.4658129805029452
+          percentage: percentage
+          count: 6.027456183070403
+        movieLength: 120
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        typeNumber: 1
+        ticketsOnSale: true
+        genres:
+        - name: name
+        - name: name
+        enName: Spider man
+        logo:
+          url: url
+        top250: 200
+        id: 666
+        alternativeName: Spider man
+        ratingMpaa: pg13
+        watchability:
+          items:
+          - name: name
+            logo:
+              url: url
+            url: url
+          - name: name
+            logo:
+              url: url
+            url: url
+        budget:
+          currency: €
+          value: 207283
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+        top10: 1
+        totalSeriesLength: 155
+        audience:
+        - country: Россия
+          count: 1000
+        - country: Россия
+          count: 1000
+        backdrop:
+          previewUrl: previewUrl
+          url: url
+        similarMovies:
+        - year: 2021
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          name: name
+          enName: enName
+          id: 2.3021358869347655
+          alternativeName: alternativeName
+          type: type
+          poster:
+            previewUrl: previewUrl
+            url: url
+        - year: 2021
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          name: name
+          enName: enName
+          id: 2.3021358869347655
+          alternativeName: alternativeName
+          type: type
+          poster:
+            previewUrl: previewUrl
+            url: url
+        externalId:
+          tmdb: 9799
+          kpHD: 48e8d0acb0f62d8585101798eaeceec5
+          imdb: tt0232500
+        shortDescription: shortDescription
+        ageRating: 16
+        countries:
+        - name: name
+        - name: name
+        premiere:
+          digital: digital
+          country: США
+          world: 2023-02-25T02:44:39.359Z
+          dvd: dvd
+          russia: 2023-02-25T02:44:39.359Z
+          cinema: 2023-02-25T02:44:39.359Z
+          bluray: bluray
+        isSeries: true
+        releaseYears:
+        - start: 2022
+          end: 2023
+        - start: 2022
+          end: 2023
+        persons:
+        - profession: profession
+          name: Пол Уокер
+          enName: Paul Walker
+          photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+          description: description
+          id: 6317
+          enProfession: enProfession
+        - profession: profession
+          name: Пол Уокер
+          enName: Paul Walker
+          photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+          description: description
+          id: 6317
+          enProfession: enProfession
+        sequelsAndPrequels:
+        - year: 2021
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          name: name
+          enName: enName
+          id: 2.3021358869347655
+          alternativeName: alternativeName
+          type: type
+          poster:
+            previewUrl: previewUrl
+            url: url
+        - year: 2021
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          name: name
+          enName: enName
+          id: 2.3021358869347655
+          alternativeName: alternativeName
+          type: type
+          poster:
+            previewUrl: previewUrl
+            url: url
+        names:
+        - name: name
+          language: language
+          type: type
+        - name: name
+          language: language
+          type: type
+        seasonsInfo:
+        - number: 5.962133916683182
+          episodesCount: 5.637376656633329
+        - number: 5.962133916683182
+          episodesCount: 5.637376656633329
+        lists:
+        - 250 лучших сериалов
+        name: Человек паук
+        seriesLength: 20
+        votes:
+          tmdb: 10000
+          imdb: 50000
+          kp: "60000"
+          await: 34000
+          russianFilmCritics: 4000
+          filmCritics: 10000
+        slogan: slogan
+        poster:
+          previewUrl: previewUrl
+          url: url
+        status: completed
+      properties:
+        id:
+          description: Id фильма с кинопоиска
+          example: 666
+          type: number
+        externalId:
+          $ref: '#/components/schemas/ExternalId'
+        name:
+          example: Человек паук
+          nullable: true
+          type: string
+        alternativeName:
+          example: Spider man
+          nullable: true
+          type: string
+        enName:
+          example: Spider man
+          nullable: true
+          type: string
+        names:
+          items:
+            $ref: '#/components/schemas/Name'
+          type: array
+        type:
+          description: "Тип тайтла. Доступны: movie | tv-series | cartoon | anime\
+            \ | animated-series | tv-show"
+          example: movie
+          type: string
+        typeNumber:
+          description: "Тип тайтла в числовом обозначении. Доступны: 1 (movie) | 2\
+            \ (tv-series) | 3 (cartoon) | 4 (anime) | 5 (animated-series) | 6 (tv-show)"
+          example: 1
+          type: number
+        year:
+          description: "Год премьеры. При поиске по этому полю, можно использовать\
+            \ интервалы 1860-2030"
+          example: 2023
+          nullable: true
+          type: number
+        description:
+          description: Описание тайтла
+          nullable: true
+          type: string
+        shortDescription:
+          description: Сокращенное описание
+          nullable: true
+          type: string
+        slogan:
+          description: Слоган
+          nullable: true
+          type: string
+        status:
+          description: "Статус релиза тайтла. Доступные значения: filming | pre-production\
+            \ | completed | announced | post-production"
+          example: completed
+          nullable: true
+          type: string
+        rating:
+          $ref: '#/components/schemas/Rating'
+        votes:
+          $ref: '#/components/schemas/Votes'
+        movieLength:
+          description: Продолжительность фильма
+          example: 120
+          nullable: true
+          type: number
+        ratingMpaa:
+          description: Возрастной рейтинг по MPAA
+          example: pg13
+          nullable: true
+          type: string
+        ageRating:
+          description: Возрастной рейтинг
+          example: 16
+          nullable: true
+          type: number
+        logo:
+          $ref: '#/components/schemas/Logo'
+        poster:
+          $ref: '#/components/schemas/ShortImage'
+        backdrop:
+          $ref: '#/components/schemas/ShortImage'
+        videos:
+          $ref: '#/components/schemas/VideoTypes'
+        genres:
+          items:
+            $ref: '#/components/schemas/ItemName'
+          type: array
+        countries:
+          items:
+            $ref: '#/components/schemas/ItemName'
+          type: array
+        persons:
+          items:
+            $ref: '#/components/schemas/PersonInMovie'
+          type: array
+        reviewInfo:
+          $ref: '#/components/schemas/ReviewInfo'
+        seasonsInfo:
+          items:
+            $ref: '#/components/schemas/SeasonInfo'
+          type: array
+        budget:
+          $ref: '#/components/schemas/CurrencyValue'
+        fees:
+          $ref: '#/components/schemas/Fees'
+        premiere:
+          $ref: '#/components/schemas/Premiere'
+        similarMovies:
+          items:
+            $ref: '#/components/schemas/LinkedMovieV1_4'
+          type: array
+        sequelsAndPrequels:
+          items:
+            $ref: '#/components/schemas/LinkedMovieV1_4'
+          type: array
+        watchability:
+          $ref: '#/components/schemas/Watchability'
+        releaseYears:
+          items:
+            $ref: '#/components/schemas/YearRange'
+          type: array
+        top10:
+          description: "Позиция тайтла в топ 10. Чтобы найти фильмы участвующие в\
+            \ рейтинге используйте: `!null`"
+          example: 1
+          nullable: true
+          type: number
+        top250:
+          description: "Позиция тайтла в топ 250. Чтобы найти фильмы участвующие в\
+            \ рейтинге используйте: `!null`"
+          example: 200
+          nullable: true
+          type: number
+        ticketsOnSale:
+          description: "Признак того, что тайтл находится в прокате"
+          example: true
+          nullable: true
+          type: boolean
+        totalSeriesLength:
+          description: Продолжительность всех серий
+          example: 155
+          nullable: true
+          type: number
+        seriesLength:
+          description: Средняя продолжительность серии
+          example: 20
+          nullable: true
+          type: number
+        isSeries:
+          description: Признак сериала
+          example: true
+          type: boolean
+        audience:
+          items:
+            $ref: '#/components/schemas/Audience'
+          nullable: true
+          type: array
+        lists:
+          description: "Список коллекций, в которых находится тайтл."
+          example:
+          - 250 лучших сериалов
+          items:
+            type: string
+          nullable: true
+          type: array
+        networks:
+          items:
+            $ref: '#/components/schemas/NetworksV1_4'
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        facts:
+          items:
+            $ref: '#/components/schemas/FactInMovie'
+          type: array
+        imagesInfo:
+          $ref: '#/components/schemas/Images'
+      required:
+      - createdAt
+      - externalId
+      - facts
+      - id
+      - imagesInfo
+      - isSeries
+      - names
+      - networks
+      - type
+      - typeNumber
+      - updatedAt
+      type: object
+    UnauthorizedErrorResponseDto:
+      properties:
+        statusCode:
+          example: 401
+          type: number
+        message:
+          example: В запросе не указан токен!
+          type: string
+        error:
+          example: Unauthorized
+          type: string
+      required:
+      - error
+      - message
+      - statusCode
+      type: object
+    ForbiddenErrorResponseDto:
+      properties:
+        statusCode:
+          example: 403
+          type: number
+        message:
+          example: Превышен дневной лимит!
+          type: string
+        error:
+          example: Forbidden
+          type: string
+      required:
+      - error
+      - message
+      - statusCode
+      type: object
+    ErrorResponseDto:
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        error:
+          type: string
+      required:
+      - error
+      - message
+      - statusCode
+      type: object
+    MovieDocsResponseDtoV1_4:
+      example:
+        total: 0.8008281904610115
+        pages: 5.962133916683182
+        docs:
+        - imagesInfo:
+            framesCount: 3.616076749251911
+            postersCount: 7.061401241503109
+            backdropsCount: 9.301444243932576
+          fees:
+            usa:
+              currency: €
+              value: 207283
+            world:
+              currency: €
+              value: 207283
+            russia:
+              currency: €
+              value: 207283
+          year: 2023
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          description: description
+          videos:
+            teasers:
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+            trailers:
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+          type: movie
+          networks:
+          - items:
+            - name: Netflix
+              logo:
+                url: url
+            - name: Netflix
+              logo:
+                url: url
+          - items:
+            - name: Netflix
+              logo:
+                url: url
+            - name: Netflix
+              logo:
+                url: url
+          facts:
+          - spoiler: true
+            type: type
+            value: value
+          - spoiler: true
+            type: type
+            value: value
+          reviewInfo:
+            positiveCount: 1.4658129805029452
+            percentage: percentage
+            count: 6.027456183070403
+          movieLength: 120
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          typeNumber: 1
+          ticketsOnSale: true
+          genres:
+          - name: name
+          - name: name
+          enName: Spider man
+          logo:
+            url: url
+          top250: 200
+          id: 666
+          alternativeName: Spider man
+          ratingMpaa: pg13
+          watchability:
+            items:
+            - name: name
+              logo:
+                url: url
+              url: url
+            - name: name
+              logo:
+                url: url
+              url: url
+          budget:
+            currency: €
+            value: 207283
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+          top10: 1
+          totalSeriesLength: 155
+          audience:
+          - country: Россия
+            count: 1000
+          - country: Россия
+            count: 1000
+          backdrop:
+            previewUrl: previewUrl
+            url: url
+          similarMovies:
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          externalId:
+            tmdb: 9799
+            kpHD: 48e8d0acb0f62d8585101798eaeceec5
+            imdb: tt0232500
+          shortDescription: shortDescription
+          ageRating: 16
+          countries:
+          - name: name
+          - name: name
+          premiere:
+            digital: digital
+            country: США
+            world: 2023-02-25T02:44:39.359Z
+            dvd: dvd
+            russia: 2023-02-25T02:44:39.359Z
+            cinema: 2023-02-25T02:44:39.359Z
+            bluray: bluray
+          isSeries: true
+          releaseYears:
+          - start: 2022
+            end: 2023
+          - start: 2022
+            end: 2023
+          persons:
+          - profession: profession
+            name: Пол Уокер
+            enName: Paul Walker
+            photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+            description: description
+            id: 6317
+            enProfession: enProfession
+          - profession: profession
+            name: Пол Уокер
+            enName: Paul Walker
+            photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+            description: description
+            id: 6317
+            enProfession: enProfession
+          sequelsAndPrequels:
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          names:
+          - name: name
+            language: language
+            type: type
+          - name: name
+            language: language
+            type: type
+          seasonsInfo:
+          - number: 5.962133916683182
+            episodesCount: 5.637376656633329
+          - number: 5.962133916683182
+            episodesCount: 5.637376656633329
+          lists:
+          - 250 лучших сериалов
+          name: Человек паук
+          seriesLength: 20
+          votes:
+            tmdb: 10000
+            imdb: 50000
+            kp: "60000"
+            await: 34000
+            russianFilmCritics: 4000
+            filmCritics: 10000
+          slogan: slogan
+          poster:
+            previewUrl: previewUrl
+            url: url
+          status: completed
+        - imagesInfo:
+            framesCount: 3.616076749251911
+            postersCount: 7.061401241503109
+            backdropsCount: 9.301444243932576
+          fees:
+            usa:
+              currency: €
+              value: 207283
+            world:
+              currency: €
+              value: 207283
+            russia:
+              currency: €
+              value: 207283
+          year: 2023
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          description: description
+          videos:
+            teasers:
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+            trailers:
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+            - site: youtube
+              size: 0.8008281904610115
+              name: Official Trailer
+              type: TRAILER
+              url: https://www.youtube.com/embed/ZsJz2TJAPjw
+          type: movie
+          networks:
+          - items:
+            - name: Netflix
+              logo:
+                url: url
+            - name: Netflix
+              logo:
+                url: url
+          - items:
+            - name: Netflix
+              logo:
+                url: url
+            - name: Netflix
+              logo:
+                url: url
+          facts:
+          - spoiler: true
+            type: type
+            value: value
+          - spoiler: true
+            type: type
+            value: value
+          reviewInfo:
+            positiveCount: 1.4658129805029452
+            percentage: percentage
+            count: 6.027456183070403
+          movieLength: 120
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          typeNumber: 1
+          ticketsOnSale: true
+          genres:
+          - name: name
+          - name: name
+          enName: Spider man
+          logo:
+            url: url
+          top250: 200
+          id: 666
+          alternativeName: Spider man
+          ratingMpaa: pg13
+          watchability:
+            items:
+            - name: name
+              logo:
+                url: url
+              url: url
+            - name: name
+              logo:
+                url: url
+              url: url
+          budget:
+            currency: €
+            value: 207283
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+          top10: 1
+          totalSeriesLength: 155
+          audience:
+          - country: Россия
+            count: 1000
+          - country: Россия
+            count: 1000
+          backdrop:
+            previewUrl: previewUrl
+            url: url
+          similarMovies:
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          externalId:
+            tmdb: 9799
+            kpHD: 48e8d0acb0f62d8585101798eaeceec5
+            imdb: tt0232500
+          shortDescription: shortDescription
+          ageRating: 16
+          countries:
+          - name: name
+          - name: name
+          premiere:
+            digital: digital
+            country: США
+            world: 2023-02-25T02:44:39.359Z
+            dvd: dvd
+            russia: 2023-02-25T02:44:39.359Z
+            cinema: 2023-02-25T02:44:39.359Z
+            bluray: bluray
+          isSeries: true
+          releaseYears:
+          - start: 2022
+            end: 2023
+          - start: 2022
+            end: 2023
+          persons:
+          - profession: profession
+            name: Пол Уокер
+            enName: Paul Walker
+            photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+            description: description
+            id: 6317
+            enProfession: enProfession
+          - profession: profession
+            name: Пол Уокер
+            enName: Paul Walker
+            photo: https://st.kp.yandex.net/images/actor_iphone/iphone360_6317.jpg
+            description: description
+            id: 6317
+            enProfession: enProfession
+          sequelsAndPrequels:
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          - year: 2021
+            rating:
+              tmdb: 3.2
+              imdb: 8.4
+              kp: 6.2
+              await: 6.1
+              russianFilmCritics: 5.1
+              filmCritics: 10
+            name: name
+            enName: enName
+            id: 2.3021358869347655
+            alternativeName: alternativeName
+            type: type
+            poster:
+              previewUrl: previewUrl
+              url: url
+          names:
+          - name: name
+            language: language
+            type: type
+          - name: name
+            language: language
+            type: type
+          seasonsInfo:
+          - number: 5.962133916683182
+            episodesCount: 5.637376656633329
+          - number: 5.962133916683182
+            episodesCount: 5.637376656633329
+          lists:
+          - 250 лучших сериалов
+          name: Человек паук
+          seriesLength: 20
+          votes:
+            tmdb: 10000
+            imdb: 50000
+            kp: "60000"
+            await: 34000
+            russianFilmCritics: 4000
+            filmCritics: 10000
+          slogan: slogan
+          poster:
+            previewUrl: previewUrl
+            url: url
+          status: completed
+        limit: 6.027456183070403
+        page: 1.4658129805029452
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/MovieDtoV1_4'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    SearchMovieDtoV1_4:
+      example:
+        year: 6.027456183070403
+        rating:
+          tmdb: 3.2
+          imdb: 8.4
+          kp: 6.2
+          await: 6.1
+          russianFilmCritics: 5.1
+          filmCritics: 10
+        description: description
+        type: type
+        movieLength: 1.4658129805029452
+        ticketsOnSale: true
+        typeNumber: 3.616076749251911
+        genres:
+        - name: name
+        - name: name
+        enName: enName
+        logo:
+          url: url
+        top250: 9.301444243932576
+        id: 0.8008281904610115
+        alternativeName: alternativeName
+        ratingMpaa: ratingMpaa
+        totalSeriesLength: 5.962133916683182
+        top10: 7.061401241503109
+        internalNames:
+        - internalNames
+        - internalNames
+        backdrop:
+          previewUrl: previewUrl
+          url: url
+        externalId: null
+        shortDescription: shortDescription
+        countries:
+        - name: name
+        - name: name
+        ageRating: 2.3021358869347655
+        internalVotes: 4.145608029883936
+        isSeries: true
+        releaseYears:
+        - start: 2022
+          end: 2023
+        - start: 2022
+          end: 2023
+        names:
+        - name: name
+          language: language
+          type: type
+        - name: name
+          language: language
+          type: type
+        name: name
+        seriesLength: 5.637376656633329
+        votes:
+          tmdb: 10000
+          imdb: 50000
+          kp: "60000"
+          await: 34000
+          russianFilmCritics: 4000
+          filmCritics: 10000
+        poster:
+          previewUrl: previewUrl
+          url: url
+        internalRating: 2.027123023002322
+        status: status
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        alternativeName:
+          type: string
+        enName:
+          type: string
+        type:
+          type: string
+        year:
+          type: number
+        description:
+          type: string
+        shortDescription:
+          type: string
+        movieLength:
+          type: number
+        names:
+          items:
+            $ref: '#/components/schemas/Name'
+          type: array
+        externalId:
+          $ref: '#/components/schemas/SearchMovieDtoV1_4_externalId'
+        logo:
+          $ref: '#/components/schemas/Logo'
+        poster:
+          $ref: '#/components/schemas/ShortImage'
+        backdrop:
+          $ref: '#/components/schemas/ShortImage'
+        rating:
+          $ref: '#/components/schemas/Rating'
+        votes:
+          $ref: '#/components/schemas/Votes'
+        genres:
+          items:
+            $ref: '#/components/schemas/ItemName'
+          type: array
+        countries:
+          items:
+            $ref: '#/components/schemas/ItemName'
+          type: array
+        releaseYears:
+          items:
+            $ref: '#/components/schemas/YearRange'
+          type: array
+        isSeries:
+          type: boolean
+        ticketsOnSale:
+          type: boolean
+        totalSeriesLength:
+          type: number
+        seriesLength:
+          type: number
+        ratingMpaa:
+          type: string
+        ageRating:
+          type: number
+        top10:
+          nullable: true
+          type: number
+        top250:
+          nullable: true
+          type: number
+        typeNumber:
+          type: number
+        status:
+          type: string
+        internalNames:
+          items:
+            type: string
+          type: array
+        internalRating:
+          type: number
+        internalVotes:
+          type: number
+      required:
+      - ageRating
+      - alternativeName
+      - description
+      - enName
+      - id
+      - internalNames
+      - internalRating
+      - internalVotes
+      - isSeries
+      - movieLength
+      - name
+      - names
+      - ratingMpaa
+      - seriesLength
+      - shortDescription
+      - status
+      - ticketsOnSale
+      - totalSeriesLength
+      - type
+      - typeNumber
+      - year
+      type: object
+    SearchMovieResponseDtoV1_4:
+      example:
+        total: 7.386281948385884
+        pages: 1.4894159098541704
+        docs:
+        - year: 6.027456183070403
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          description: description
+          type: type
+          movieLength: 1.4658129805029452
+          ticketsOnSale: true
+          typeNumber: 3.616076749251911
+          genres:
+          - name: name
+          - name: name
+          enName: enName
+          logo:
+            url: url
+          top250: 9.301444243932576
+          id: 0.8008281904610115
+          alternativeName: alternativeName
+          ratingMpaa: ratingMpaa
+          totalSeriesLength: 5.962133916683182
+          top10: 7.061401241503109
+          internalNames:
+          - internalNames
+          - internalNames
+          backdrop:
+            previewUrl: previewUrl
+            url: url
+          externalId: null
+          shortDescription: shortDescription
+          countries:
+          - name: name
+          - name: name
+          ageRating: 2.3021358869347655
+          internalVotes: 4.145608029883936
+          isSeries: true
+          releaseYears:
+          - start: 2022
+            end: 2023
+          - start: 2022
+            end: 2023
+          names:
+          - name: name
+            language: language
+            type: type
+          - name: name
+            language: language
+            type: type
+          name: name
+          seriesLength: 5.637376656633329
+          votes:
+            tmdb: 10000
+            imdb: 50000
+            kp: "60000"
+            await: 34000
+            russianFilmCritics: 4000
+            filmCritics: 10000
+          poster:
+            previewUrl: previewUrl
+            url: url
+          internalRating: 2.027123023002322
+          status: status
+        - year: 6.027456183070403
+          rating:
+            tmdb: 3.2
+            imdb: 8.4
+            kp: 6.2
+            await: 6.1
+            russianFilmCritics: 5.1
+            filmCritics: 10
+          description: description
+          type: type
+          movieLength: 1.4658129805029452
+          ticketsOnSale: true
+          typeNumber: 3.616076749251911
+          genres:
+          - name: name
+          - name: name
+          enName: enName
+          logo:
+            url: url
+          top250: 9.301444243932576
+          id: 0.8008281904610115
+          alternativeName: alternativeName
+          ratingMpaa: ratingMpaa
+          totalSeriesLength: 5.962133916683182
+          top10: 7.061401241503109
+          internalNames:
+          - internalNames
+          - internalNames
+          backdrop:
+            previewUrl: previewUrl
+            url: url
+          externalId: null
+          shortDescription: shortDescription
+          countries:
+          - name: name
+          - name: name
+          ageRating: 2.3021358869347655
+          internalVotes: 4.145608029883936
+          isSeries: true
+          releaseYears:
+          - start: 2022
+            end: 2023
+          - start: 2022
+            end: 2023
+          names:
+          - name: name
+            language: language
+            type: type
+          - name: name
+            language: language
+            type: type
+          name: name
+          seriesLength: 5.637376656633329
+          votes:
+            tmdb: 10000
+            imdb: 50000
+            kp: "60000"
+            await: 34000
+            russianFilmCritics: 4000
+            filmCritics: 10000
+          poster:
+            previewUrl: previewUrl
+            url: url
+          internalRating: 2.027123023002322
+          status: status
+        limit: 1.2315135367772556
+        page: 1.0246457001441578
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/SearchMovieDtoV1_4'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    NominationAward:
+      example:
+        year: 0.8008281904610115
+        title: title
+      properties:
+        title:
+          type: string
+        year:
+          type: number
+      required:
+      - title
+      - year
+      type: object
+    Nomination:
+      example:
+        award:
+          year: 0.8008281904610115
+          title: title
+        title: title
+      properties:
+        award:
+          $ref: '#/components/schemas/NominationAward'
+        title:
+          type: string
+      required:
+      - award
+      - title
+      type: object
+    PartialTypeClass:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        winning: true
+        movieId: 6.027456183070403
+        nomination:
+          award:
+            year: 0.8008281904610115
+            title: title
+          title: title
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        nomination:
+          $ref: '#/components/schemas/Nomination'
+        winning:
+          type: boolean
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        movieId:
+          type: number
+      type: object
+    MovieAwardDocsResponseDto:
+      example:
+        total: 1.4658129805029452
+        pages: 2.3021358869347655
+        docs:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          winning: true
+          movieId: 6.027456183070403
+          nomination:
+            award:
+              year: 0.8008281904610115
+              title: title
+            title: title
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          winning: true
+          movieId: 6.027456183070403
+          nomination:
+            award:
+              year: 0.8008281904610115
+              title: title
+            title: title
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 5.962133916683182
+        page: 5.637376656633329
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/PartialTypeClass'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    PossibleValueDto:
+      example:
+        name: name
+        slug: slug
+      properties:
+        name:
+          description: Значение по которому нужно делать запрос в базу данных
+          type: string
+        slug:
+          description: Вспомогательное значение
+          type: string
+      required:
+      - name
+      - slug
+      type: object
+    EpisodeV1_4:
+      example:
+        date: date
+        number: 5.962133916683182
+        still:
+          previewUrl: previewUrl
+          url: url
+        enDescription: enDescription
+        name: name
+        enName: enName
+        airDate: airDate
+        description: description
+      properties:
+        number:
+          type: number
+        name:
+          type: string
+        enName:
+          type: string
+        date:
+          deprecated: true
+          type: string
+        description:
+          type: string
+        still:
+          $ref: '#/components/schemas/ShortImage'
+        airDate:
+          type: string
+        enDescription:
+          type: string
+      type: object
+    SeasonV1_4:
+      example:
+        airDate: airDate
+        description: description
+        movieId: 0.8008281904610115
+        duration: 5.637376656633329
+        number: 6.027456183070403
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        enDescription: enDescription
+        name: name
+        enName: enName
+        episodesCount: 1.4658129805029452
+        poster:
+          previewUrl: previewUrl
+          url: url
+        episodes:
+        - date: date
+          number: 5.962133916683182
+          still:
+            previewUrl: previewUrl
+            url: url
+          enDescription: enDescription
+          name: name
+          enName: enName
+          airDate: airDate
+          description: description
+        - date: date
+          number: 5.962133916683182
+          still:
+            previewUrl: previewUrl
+            url: url
+          enDescription: enDescription
+          name: name
+          enName: enName
+          airDate: airDate
+          description: description
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        movieId:
+          type: number
+        number:
+          type: number
+        episodesCount:
+          type: number
+        episodes:
+          items:
+            $ref: '#/components/schemas/EpisodeV1_4'
+          type: array
+        poster:
+          $ref: '#/components/schemas/ShortImage'
+        name:
+          type: string
+        enName:
+          type: string
+        duration:
+          type: number
+        description:
+          type: string
+        enDescription:
+          type: string
+        airDate:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - updatedAt
+      type: object
+    SeasonDocsResponseDtoV1_4:
+      example:
+        total: 2.3021358869347655
+        pages: 3.616076749251911
+        docs:
+        - airDate: airDate
+          description: description
+          movieId: 0.8008281904610115
+          duration: 5.637376656633329
+          number: 6.027456183070403
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          enDescription: enDescription
+          name: name
+          enName: enName
+          episodesCount: 1.4658129805029452
+          poster:
+            previewUrl: previewUrl
+            url: url
+          episodes:
+          - date: date
+            number: 5.962133916683182
+            still:
+              previewUrl: previewUrl
+              url: url
+            enDescription: enDescription
+            name: name
+            enName: enName
+            airDate: airDate
+            description: description
+          - date: date
+            number: 5.962133916683182
+            still:
+              previewUrl: previewUrl
+              url: url
+            enDescription: enDescription
+            name: name
+            enName: enName
+            airDate: airDate
+            description: description
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - airDate: airDate
+          description: description
+          movieId: 0.8008281904610115
+          duration: 5.637376656633329
+          number: 6.027456183070403
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          enDescription: enDescription
+          name: name
+          enName: enName
+          episodesCount: 1.4658129805029452
+          poster:
+            previewUrl: previewUrl
+            url: url
+          episodes:
+          - date: date
+            number: 5.962133916683182
+            still:
+              previewUrl: previewUrl
+              url: url
+            enDescription: enDescription
+            name: name
+            enName: enName
+            airDate: airDate
+            description: description
+          - date: date
+            number: 5.962133916683182
+            still:
+              previewUrl: previewUrl
+              url: url
+            enDescription: enDescription
+            name: name
+            enName: enName
+            airDate: airDate
+            description: description
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 7.061401241503109
+        page: 9.301444243932576
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/SeasonV1_4'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    Review:
+      example:
+        date: date
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        review: review
+        author: author
+        movieId: 6.027456183070403
+        id: 0.8008281904610115
+        title: title
+        type: type
+        authorId: 1.4658129805029452
+        userRating: 5.962133916683182
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          type: number
+        movieId:
+          type: number
+        title:
+          type: string
+        type:
+          type: string
+        review:
+          type: string
+        date:
+          type: string
+        author:
+          type: string
+        authorId:
+          type: number
+        userRating:
+          type: number
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - updatedAt
+      - userRating
+      type: object
+    ReviewDocsResponseDtoV1_4:
+      example:
+        total: 5.637376656633329
+        pages: 9.301444243932576
+        docs:
+        - date: date
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          review: review
+          author: author
+          movieId: 6.027456183070403
+          id: 0.8008281904610115
+          title: title
+          type: type
+          authorId: 1.4658129805029452
+          userRating: 5.962133916683182
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - date: date
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          review: review
+          author: author
+          movieId: 6.027456183070403
+          id: 0.8008281904610115
+          title: title
+          type: type
+          authorId: 1.4658129805029452
+          userRating: 5.962133916683182
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 2.3021358869347655
+        page: 7.061401241503109
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/Review'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    BirthPlace:
+      example:
+        value: value
+      properties:
+        value:
+          type: string
+      type: object
+    DeathPlace:
+      example:
+        value: value
+      properties:
+        value:
+          type: string
+      type: object
+    Spouses:
+      example:
+        divorcedReason: divorcedReason
+        children: 5.637376656633329
+        sex: sex
+        name: name
+        id: 5.962133916683182
+        divorced: true
+        relation: relation
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        divorced:
+          type: boolean
+        divorcedReason:
+          type: string
+        sex:
+          type: string
+        children:
+          type: number
+        relation:
+          type: string
+      type: object
+    Profession:
+      example:
+        value: value
+      properties:
+        value:
+          type: string
+      type: object
+    FactInPerson:
+      example:
+        value: value
+      properties:
+        value:
+          type: string
+      type: object
+    MovieInPerson:
+      example:
+        general: true
+        name: name
+        rating: 9.301444243932576
+        description: description
+        id: 7.061401241503109
+        alternativeName: alternativeName
+        enProfession: enProfession
+      properties:
+        id:
+          type: number
+        name:
+          nullable: true
+          type: string
+        alternativeName:
+          nullable: true
+          type: string
+        rating:
+          nullable: true
+          type: number
+        general:
+          nullable: true
+          type: boolean
+        description:
+          nullable: true
+          type: string
+        enProfession:
+          nullable: true
+          type: string
+      required:
+      - id
+      type: object
+    Person:
+      example:
+        birthday: birthday
+        spouses:
+          divorcedReason: divorcedReason
+          children: 5.637376656633329
+          sex: sex
+          name: name
+          id: 5.962133916683182
+          divorced: true
+          relation: relation
+        profession:
+        - value: value
+        - value: value
+        death: death
+        sex: sex
+        photo: photo
+        countAwards: 2.3021358869347655
+        facts:
+        - value: value
+        - value: value
+        movies:
+        - general: true
+          name: name
+          rating: 9.301444243932576
+          description: description
+          id: 7.061401241503109
+          alternativeName: alternativeName
+          enProfession: enProfession
+        - general: true
+          name: name
+          rating: 9.301444243932576
+          description: description
+          id: 7.061401241503109
+          alternativeName: alternativeName
+          enProfession: enProfession
+        birthPlace:
+        - value: value
+        - value: value
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        deathPlace:
+        - value: value
+        - value: value
+        name: name
+        enName: enName
+        growth: 6.027456183070403
+        id: 0.8008281904610115
+        age: 1.4658129805029452
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          type: number
+        name:
+          nullable: true
+          type: string
+        enName:
+          nullable: true
+          type: string
+        photo:
+          nullable: true
+          type: string
+        sex:
+          nullable: true
+          type: string
+        growth:
+          nullable: true
+          type: number
+        birthday:
+          nullable: true
+          type: string
+        death:
+          nullable: true
+          type: string
+        age:
+          nullable: true
+          type: number
+        birthPlace:
+          items:
+            $ref: '#/components/schemas/BirthPlace'
+          type: array
+        deathPlace:
+          items:
+            $ref: '#/components/schemas/DeathPlace'
+          type: array
+        spouses:
+          $ref: '#/components/schemas/Spouses'
+        countAwards:
+          type: number
+        profession:
+          items:
+            $ref: '#/components/schemas/Profession'
+          type: array
+        facts:
+          items:
+            $ref: '#/components/schemas/FactInPerson'
+          type: array
+        movies:
+          items:
+            $ref: '#/components/schemas/MovieInPerson'
+          type: array
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - id
+      - updatedAt
+      type: object
+    PersonDocsResponseDtoV1_4:
+      example:
+        total: 0.8008281904610115
+        pages: 5.962133916683182
+        docs:
+        - birthday: birthday
+          spouses:
+            divorcedReason: divorcedReason
+            children: 5.637376656633329
+            sex: sex
+            name: name
+            id: 5.962133916683182
+            divorced: true
+            relation: relation
+          profession:
+          - value: value
+          - value: value
+          death: death
+          sex: sex
+          photo: photo
+          countAwards: 2.3021358869347655
+          facts:
+          - value: value
+          - value: value
+          movies:
+          - general: true
+            name: name
+            rating: 9.301444243932576
+            description: description
+            id: 7.061401241503109
+            alternativeName: alternativeName
+            enProfession: enProfession
+          - general: true
+            name: name
+            rating: 9.301444243932576
+            description: description
+            id: 7.061401241503109
+            alternativeName: alternativeName
+            enProfession: enProfession
+          birthPlace:
+          - value: value
+          - value: value
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          deathPlace:
+          - value: value
+          - value: value
+          name: name
+          enName: enName
+          growth: 6.027456183070403
+          id: 0.8008281904610115
+          age: 1.4658129805029452
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - birthday: birthday
+          spouses:
+            divorcedReason: divorcedReason
+            children: 5.637376656633329
+            sex: sex
+            name: name
+            id: 5.962133916683182
+            divorced: true
+            relation: relation
+          profession:
+          - value: value
+          - value: value
+          death: death
+          sex: sex
+          photo: photo
+          countAwards: 2.3021358869347655
+          facts:
+          - value: value
+          - value: value
+          movies:
+          - general: true
+            name: name
+            rating: 9.301444243932576
+            description: description
+            id: 7.061401241503109
+            alternativeName: alternativeName
+            enProfession: enProfession
+          - general: true
+            name: name
+            rating: 9.301444243932576
+            description: description
+            id: 7.061401241503109
+            alternativeName: alternativeName
+            enProfession: enProfession
+          birthPlace:
+          - value: value
+          - value: value
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          deathPlace:
+          - value: value
+          - value: value
+          name: name
+          enName: enName
+          growth: 6.027456183070403
+          id: 0.8008281904610115
+          age: 1.4658129805029452
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 6.027456183070403
+        page: 1.4658129805029452
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/Person'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    MeiliPersonEntityV1_4:
+      example:
+        birthday: birthday
+        profession:
+        - value: value
+        - value: value
+        death: death
+        sex: sex
+        photo: photo
+        "1": "{}"
+        birthPlace:
+        - value: value
+        - value: value
+        deathPlace:
+        - value: value
+        - value: value
+        name: name
+        enName: enName
+        growth: 1.4658129805029452
+        id: 0.8008281904610115
+        age: 6.027456183070403
+      properties:
+        "1":
+          type: object
+        id:
+          type: number
+        name:
+          type: string
+        enName:
+          type: string
+        photo:
+          type: string
+        sex:
+          type: string
+        birthday:
+          type: string
+        death:
+          type: string
+        age:
+          type: number
+        birthPlace:
+          items:
+            $ref: '#/components/schemas/BirthPlace'
+          type: array
+        deathPlace:
+          items:
+            $ref: '#/components/schemas/DeathPlace'
+          type: array
+        profession:
+          items:
+            $ref: '#/components/schemas/Profession'
+          type: array
+        growth:
+          type: number
+      required:
+      - "1"
+      - age
+      - birthday
+      - death
+      - enName
+      - growth
+      - id
+      - name
+      - photo
+      - sex
+      type: object
+    SearchPersonResponseDtoV1_4:
+      example:
+        total: 5.962133916683182
+        pages: 7.061401241503109
+        docs:
+        - birthday: birthday
+          profession:
+          - value: value
+          - value: value
+          death: death
+          sex: sex
+          photo: photo
+          "1": "{}"
+          birthPlace:
+          - value: value
+          - value: value
+          deathPlace:
+          - value: value
+          - value: value
+          name: name
+          enName: enName
+          growth: 1.4658129805029452
+          id: 0.8008281904610115
+          age: 6.027456183070403
+        - birthday: birthday
+          profession:
+          - value: value
+          - value: value
+          death: death
+          sex: sex
+          photo: photo
+          "1": "{}"
+          birthPlace:
+          - value: value
+          - value: value
+          deathPlace:
+          - value: value
+          - value: value
+          name: name
+          enName: enName
+          growth: 1.4658129805029452
+          id: 0.8008281904610115
+          age: 6.027456183070403
+        limit: 5.637376656633329
+        page: 2.3021358869347655
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/MeiliPersonEntityV1_4'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    Movie:
+      example:
+        name: name
+        rating: 1.4658129805029452
+        id: 6.027456183070403
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        rating:
+          type: number
+      required:
+      - id
+      - name
+      - rating
+      type: object
+    PersonAward:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        winning: true
+        movie:
+          name: name
+          rating: 1.4658129805029452
+          id: 6.027456183070403
+        personId: 0.8008281904610115
+        nomination:
+          award:
+            year: 0.8008281904610115
+            title: title
+          title: title
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        nomination:
+          $ref: '#/components/schemas/Nomination'
+        winning:
+          type: boolean
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        personId:
+          type: number
+        movie:
+          $ref: '#/components/schemas/Movie'
+      required:
+      - createdAt
+      - movie
+      - nomination
+      - personId
+      - updatedAt
+      - winning
+      type: object
+    PersonAwardDocsResponseDto:
+      example:
+        total: 5.962133916683182
+        pages: 7.061401241503109
+        docs:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          winning: true
+          movie:
+            name: name
+            rating: 1.4658129805029452
+            id: 6.027456183070403
+          personId: 0.8008281904610115
+          nomination:
+            award:
+              year: 0.8008281904610115
+              title: title
+            title: title
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          winning: true
+          movie:
+            name: name
+            rating: 1.4658129805029452
+            id: 6.027456183070403
+          personId: 0.8008281904610115
+          nomination:
+            award:
+              year: 0.8008281904610115
+              title: title
+            title: title
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 5.637376656633329
+        page: 2.3021358869347655
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/PersonAward'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    MovieFromStudio:
+      example:
+        id: 0.8008281904610115
+      properties:
+        id:
+          type: number
+      type: object
+    Studio:
+      example:
+        movies:
+          id: 0.8008281904610115
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        subType: subType
+        id: id
+        title: title
+        type: Производство
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          type: string
+        subType:
+          type: string
+        title:
+          type: string
+        type:
+          enum:
+          - Производство
+          - Спецэффекты
+          - Прокат
+          - Студия дубляжа
+          type: string
+        movies:
+          $ref: '#/components/schemas/MovieFromStudio'
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - id
+      - subType
+      - title
+      - updatedAt
+      type: object
+    StudioDocsResponseDtoV1_4:
+      example:
+        total: 6.027456183070403
+        pages: 5.637376656633329
+        docs:
+        - movies:
+            id: 0.8008281904610115
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          subType: subType
+          id: id
+          title: title
+          type: Производство
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - movies:
+            id: 0.8008281904610115
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          subType: subType
+          id: id
+          title: title
+          type: Производство
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 1.4658129805029452
+        page: 5.962133916683182
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/Studio'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    MovieFromKeyword:
+      example:
+        id: 6.027456183070403
+      properties:
+        id:
+          type: number
+      type: object
+    Keyword:
+      example:
+        movies:
+          id: 6.027456183070403
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        id: 0.8008281904610115
+        title: title
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          type: number
+        title:
+          type: string
+        movies:
+          $ref: '#/components/schemas/MovieFromKeyword'
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - id
+      - title
+      - updatedAt
+      type: object
+    KeywordDocsResponseDtoV1_4:
+      example:
+        total: 1.4658129805029452
+        pages: 2.3021358869347655
+        docs:
+        - movies:
+            id: 6.027456183070403
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          id: 0.8008281904610115
+          title: title
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - movies:
+            id: 6.027456183070403
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          id: 0.8008281904610115
+          title: title
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 5.962133916683182
+        page: 5.637376656633329
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/Keyword'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    Image:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        previewUrl: previewUrl
+        width: 1.4658129805029452
+        movieId: 0.8008281904610115
+        language: language
+        type: type
+        url: url
+        height: 6.027456183070403
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        movieId:
+          type: number
+        type:
+          type: string
+        language:
+          type: string
+        url:
+          type: string
+        previewUrl:
+          type: string
+        height:
+          type: number
+        width:
+          type: number
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - createdAt
+      - movieId
+      - updatedAt
+      type: object
+    ImageDocsResponseDtoV1_4:
+      example:
+        total: 5.962133916683182
+        pages: 7.061401241503109
+        docs:
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          previewUrl: previewUrl
+          width: 1.4658129805029452
+          movieId: 0.8008281904610115
+          language: language
+          type: type
+          url: url
+          height: 6.027456183070403
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - createdAt: 2000-01-23T04:56:07.000+00:00
+          previewUrl: previewUrl
+          width: 1.4658129805029452
+          movieId: 0.8008281904610115
+          language: language
+          type: type
+          url: url
+          height: 6.027456183070403
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 5.637376656633329
+        page: 2.3021358869347655
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/Image'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    List:
+      example:
+        cover:
+          previewUrl: previewUrl
+          url: url
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        name: name
+        moviesCount: 0.8008281904610115
+        category: category
+        slug: slug
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        category:
+          type: string
+        slug:
+          type: string
+        moviesCount:
+          type: number
+        cover:
+          $ref: '#/components/schemas/ShortImage'
+        name:
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+      - category
+      - cover
+      - createdAt
+      - moviesCount
+      - name
+      - slug
+      - updatedAt
+      type: object
+    ListDocsResponseDtoV1_4:
+      example:
+        total: 6.027456183070403
+        pages: 5.637376656633329
+        docs:
+        - cover:
+            previewUrl: previewUrl
+            url: url
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          moviesCount: 0.8008281904610115
+          category: category
+          slug: slug
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        - cover:
+            previewUrl: previewUrl
+            url: url
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          name: name
+          moviesCount: 0.8008281904610115
+          category: category
+          slug: slug
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        limit: 1.4658129805029452
+        page: 5.962133916683182
+      properties:
+        docs:
+          items:
+            $ref: '#/components/schemas/List'
+          type: array
+        total:
+          description: Общее количество результатов
+          type: number
+        limit:
+          description: Количество результатов на странице
+          type: number
+        page:
+          description: Текущая страница
+          type: number
+        pages:
+          description: Сколько страниц всего
+          type: number
+      required:
+      - docs
+      - limit
+      - page
+      - pages
+      - total
+      type: object
+    SearchMovieDtoV1_4_externalId:
+      allOf:
+      - $ref: '#/components/schemas/ExternalId'
+      nullable: true
+  securitySchemes:
+    X-API-KEY:
+      in: header
+      name: X-API-KEY
+      type: apiKey
